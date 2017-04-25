@@ -8,7 +8,8 @@ from ply import lex
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-tokens = 'o u e i O U E k n r l K N R L t m j h'.split()
+#tokens = 'o u e i O U E k n r l K N R L t m j h'.split()
+tokens = 'o u e i O U E k n r K t m j h'.split()
 
 #t_c = r'(ㄱ|ㄲ|ㄴ|ㄷ|ㄸ|ㄹ|ㅁ|ㅂ|ㅃ|ㅅ|ㅆ|ㅇ|ㅈ|ㅉ|ㅊ|ㅋ|ㅌ|ㅍ|ㅎ)'
 #t_v = r'(ㅏ|ㅐ|ㅑ|ㅒ|ㅓ|ㅔ|ㅕ|ㅖ|ㅗ|ㅛ|ㅜ|ㅠ|ㅡ|ㅣ)'
@@ -44,21 +45,32 @@ t_h = r'(ㅎ)'
 t_t = r'(ㄲ|ㄷ|ㄸ|ㅃ|ㅆ|ㅇ|ㅉ|ㅊ|ㅋ)'
 #t_c = t_k + t_n + t_r + t_K + t_j + t_h + t_m + t_t
 
+literals = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ`1234567890-= \n\b,./<>?;\':\"\[]{}\\|~!@#$%^&*()_+'
+
 def t_error(t):
     print("Illegal character '%s'" % t.value[0])
     t.lexer.skip(1)
 
-ic = dict('ㄱ ㄲ ㄴ ㄷ ㄸ ㄹ ㅁ ㅂ ㅃ ㅅ ㅆ ㅇ ㅈ ㅉ ㅊ ㅋ ㅌ ㅍ ㅎ'.split(), range(19))
-md = dict('ㅏ ㅐ ㅑ ㅒ ㅓ ㅔ ㅕ ㅖ ㅗ ㅘ ㅙ ㅚ ㅛ ㅜ ㅝ ㅞ ㅟ ㅠ ㅡ ㅢ ㅣ'.split(), range(21))
-fc = dict(['']+'ㄱ ㄲ ㄳ ㄴ ㄵ ㄶ ㄷ ㄹ ㄺ ㄻ ㄼ ㄽ ㄾ ㄿ ㅀ ㅁ ㅂ ㅄ ㅅ ㅆ ㅇ ㅈ ㅊ ㅋ ㅌ ㅍ ㅎ'.split(), range(28))
+ic = dict([(ele, i) for i, ele in enumerate('ㄱ ㄲ ㄴ ㄷ ㄸ ㄹ ㅁ ㅂ ㅃ ㅅ ㅆ ㅇ ㅈ ㅉ ㅊ ㅋ ㅌ ㅍ ㅎ'.split())])
+md = dict([(ele, i) for i, ele in enumerate('ㅏ ㅐ ㅑ ㅒ ㅓ ㅔ ㅕ ㅖ ㅗ ㅘ ㅙ ㅚ ㅛ ㅜ ㅝ ㅞ ㅟ ㅠ ㅡ ㅢ ㅣ'.split())])
+fc = dict([(ele, i) for i, ele in enumerate(['']+'ㄱ ㄲ ㄳ ㄴ ㄵ ㄶ ㄷ ㄹ ㄺ ㄻ ㄼ ㄽ ㄾ ㄿ ㅀ ㅁ ㅂ ㅄ ㅅ ㅆ ㅇ ㅈ ㅊ ㅋ ㅌ ㅍ ㅎ'.split())])
+mds = {'ㅗㅏ':'ㅘ','ㅗㅐ':'ㅙ','ㅗㅣ':'ㅚ','ㅜㅓ':'ㅝ','ㅜㅔ':'ㅞ','ㅜㅣ':'ㅟ','ㅡㅣ':'ㅢ'}
+fcs = {'ㄱㅅ':'ㄳ','ㄴㅈ':'ㄵ','ㄴㅎ':'ㄶ','ㄹㄱ':'ㄺ','ㄹㅁ':'ㄻ','ㄹㅂ':'ㄼ','ㄹㅅ':'ㄽ','ㄹㅌ':'ㄾ','ㄹㅍ':'ㄿ','ㄹㅎ':'ㅀ','ㅂㅅ':'ㅄ'}
+
 #hangeul = r'(%s(%s%s?|%s%s?|%s%s?|%s)(%s%s?|%s%s?|%s%s?|%s%s?)?)+' %(t_c, t_o, t_O, t_u, t_U, t_e, t_E, t_i, t_k, t_K, t_n, t_N, t_r, t_R, t_l, t_L)
-hangeul = r'((k|n|r|K|j|h|m|t)(o(O|E)?|u(U|E)?|eE?|(O|U|E|i))(kK?|n(j|h)?|r(k|m|h)?|(t|n|r)?))+'
+hangeul = r'((k|n|r|K|j|h|m|t)(o(O|E)?|u(U|E)?|eE?|(O|U|E|i))(kK?|n(j|h)?|r(k|m|h)?|(K|j|h|t|n|r)?))+'
 prog = re.compile(hangeul)
 
 lexer = lex.lex()
 
 #string = raw_input("한글을 입력해주세요\n")
-string = 'ㄱㅏㅇㅅㅏㄴㅎㅗㅏㅈㅏㄱㅇㅛㅇㅇㄴㄴㅏㄴㅣㄴㅈㅏㅏㅏㄴㅇㄹㅏㄹㄱ'
+choice = raw_input("한글을 입력해주세요\n")
+if choice == '1':
+    string = 'ㄱㅏㅇㅅㅏㄴㅎㅗㅏㅈㅏㄱㅇㅛㅇㅇㄴㄴㅏㄴㅣㄴㅈㅏ\bㅏㅏㄴㅇㄹㅏㄹㄱ,./<?>'
+elif choice == '2':
+    string = 'ㅇㅏㄴㄴㅕㅇㅎㅏㅅㅅㅐㅅㅇㅇㅕ ㅈㅓㄴㄴ ㅡㄴㅇㅈㅓ134$@#40dfa_+_)+[]\\|()ㅇㅣㅂㄴㅣㄷㅏ'
+elif choice == '3':
+    string = 'knrKㄱㅔㅇㅣㅁㅁ ㅁㅏㄹㄱㅗㄴㅡㄴ ㅎㅏㅎㄹㅔㄱ \bㅇㅓㅂㅅㄷㅏㄴㅡㄴ ㄴ1211ㅅㅔ'
 lexer.input(string)
 
 output = []
@@ -71,22 +83,52 @@ while True:
     types = ''.join([o.type for o in output])
     print "%15s: %s" %("Type List", types)
     total_re_len = [sum([len(e[0]) for e in ele]) for ele in [prog.findall(types, 0, i) + prog.findall(types, i, len(types)) for i in range(len(types))]]
-    print "%15s: %s" %("Max RE Length", np.max(total_re_len))
+    print "%15s: %s" %("Max RE Length", np.max(total_re_len)),
     i = np.argmax(total_re_len)
     buff = [ele[0] for ele in prog.findall(types,0,i)+prog.findall(types,i,len(types))]
     print "%15s: %s" %("Max Buffers", ' '.join(buff))
 
     if len(buff) == 2:
-        print "Complete %s" %''.join([o.value for o in output[:i]
+        print "%15s: %s" %("Complete", ''.join([o.value for o in output[:i]]))
         final.append([o.value for o in output[:i]])
         output = output[i:]
     elif total_re_len[i] < len(output):
+        print "%15s: %s" %("Complete", ''.join([o.value for o in output[:-1]]))
         final.append([o.value for o in output[:-1]])
         output = output[-1:]
+
+complete_buffer = ''
 final.append([o.value for o in output])
 for f in final:
-    iC = f[0:1]
-    mD = f[1:2]
-    fC = f[2:]
-    
-    print ''.join(f)
+    if not f: continue
+    if len(f) == 5:
+        mD = md[mds[''.join(f[1:3])]]
+        fC = fc[fcs[''.join(f[3])]]
+    elif len(f) == 4:
+        if mds.has_key(''.join(f[1:3])):
+            mD = md[mds[''.join(f[1:3])]]
+            fC = fc[f[3]]
+        else:
+            mD = md[f[1]]
+            fC = fc[fcs[''.join(f[2:])]]
+    elif len(f) == 3:
+        if mds.has_key(''.join(f[1:3])):
+            mD = md[mds[''.join(f[1:3])]]
+            fC = 0
+        else:
+            mD = md[f[1]]
+            fC = fc[f[2]]
+    elif len(f) == 2:
+        mD = md[f[1]]
+        fC = 0
+    else:
+        complete_buffer += f[0]
+        continue
+    if md.has_key(f[0]):
+        complete_buffer += f[0]
+        continue
+    iC = ic[f[0]]
+    complete_buffer += unichr(0xAC00 + iC*21*28 + mD*28 + fC)
+    print ''.join(f),
+    print iC, mD, fC
+print complete_buffer
